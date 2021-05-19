@@ -7,7 +7,7 @@ function printMat(mat, selector) {
             var cellContent = cell.content;
             var cellMinesNegsCount = cell.minesNegsCount
             var className = 'cell cell-' + i + '-' + j;
-            if (cell.isShown && cellContent === EMPTY) className += ' marked ';
+            if (cell.isShown && cellContent === EMPTY) className += ' -marked ';
             if (cell.isShown && cellContent === MINE) className += ' mineShown ';
             strHTML += `<td class="${className}" oncontextmenu="flagCell(this)" onclick="cellClicked(this, '${cellContent}')" >`;
             if (cell.isFlagged) {
@@ -50,61 +50,56 @@ function getRandomColor() {
     return color;
 }
 
-function renderCell(location, value) {
-    // Select the elCell and set the value
-    var elCell = document.querySelector(`.cell${location.i}-${location.j}`);
-    elCell.innerHTML = value;
-}
-
 function getClassName(location) {
     var cellClass = 'cell-' + location.i + '-' + location.j;
     return cellClass;
 }
-var gclockTimeout;
+
+var gclockInterval;
+var gHour, gMin, gSec, gHelper;
+var timeStart, timeEnd;
 
 function stopWatch() {
-    if (hour < 10 && min < 10 && sec < 10) { //adding zero to show 2 digits
-        document.querySelector(".stopWatch").innerText = "0" + hour + ":0" + min + ":0" + sec;
-    } else if (hour < 10 && min < 10) {
-        document.querySelector(".stopWatch").innerText = "0" + hour + ":0" + min + ":" + sec;
-    } else if (hour < 10) {
-        document.querySelector(".stopWatch").innerText = "0" + hour + ":" + min + ":" + sec;
-    } else if (min < 10 && sec < 10) {
-        document.querySelector(".stopWatch").innerText = hour + ":0" + min + ":0" + sec;
-    } else if (min < 10) {
-        document.querySelector(".stopWatch").innerText = hour + ":0" + min + ":" + sec;
-    } else if (sec < 10) {
-        document.querySelector(".stopWatch").innerText = hour + ":" + min + ":0" + sec;
+    if (gHour === 23 && gMin === 59 && gSec === 59) { //increasing the watch
+        gHour = 0;
+        gMin = 0;
+        gSec = 0;
+    } else if (gMin === 59 && gSec === 59) {
+        gHour++;
+        gMin = 0;
+        gSec = 0;
+    } else if (gSec === 59) {
+        gMin++;
+        gSec = 0;
     } else {
-        document.querySelector(".stopWatch").innerText = hour + ":" + min + ":" + sec;
+        gSec++;
     }
 
-    if (h === 1) { //helps to stop the watch
-        return;
-    }
-
-    if (hour === 23 && min === 59 && sec === 59) { //increasing the watch
-        hour = 0;
-        min = 0;
-        sec = 0;
-    } else if (min === 59 && sec === 59) {
-        hour++;
-        min = 0;
-        sec = 0;
-    } else if (sec === 59) {
-        min++;
-        sec = 0;
+    if (gHour < 10 && gMin < 10 && gSec < 10) { //adding zero to show 2 digits
+        document.querySelector(".stopWatch").innerText = "0" + gHour + ":0" + gMin + ":0" + gSec;
+    } else if (gHour < 10 && gMin < 10) {
+        document.querySelector(".stopWatch").innerText = "0" + gHour + ":0" + gMin + ":" + gSec;
+    } else if (gHour < 10) {
+        document.querySelector(".stopWatch").innerText = "0" + gHour + ":" + gMin + ":" + gSec;
+    } else if (gMin < 10 && gSec < 10) {
+        document.querySelector(".stopWatch").innerText = gHour + ":0" + gMin + ":0" + gSec;
+    } else if (gMin < 10) {
+        document.querySelector(".stopWatch").innerText = gHour + ":0" + gMin + ":" + gSec;
+    } else if (gSec < 10) {
+        document.querySelector(".stopWatch").innerText = gHour + ":" + gMin + ":0" + gSec;
     } else {
-        sec++;
+        document.querySelector(".stopWatch").innerText = gHour + ":" + gMin + ":" + gSec;
     }
 
-    gclockTimeout = setTimeout("stopWatch()", 1000); //re-counting every second
+
+
 }
 
 function resetWatch() { //reseting the watch and the counting
-    hour = 0;
-    min = 0;
-    sec = 0;
-    h = 0;
+    gHour = 0;
+    gMin = 0;
+    gSec = 0;
+    gHelper = 0;
     document.querySelector(".stopWatch").innerText = '00:00:00';
+    // clearInterval(gclockInterval);
 }

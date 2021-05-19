@@ -15,24 +15,25 @@ var gGame = {
 
 var gBoard;
 
-var clicksCounter = 0; //helps to start the clock
-var timeStart, timeEnd;
+var clicksCounter = 0; //helps to indicate the first click
 
-var hour = 0;
-var min = 0;
-var sec = 0;
-var h = 0;
 var gSize = 4;
 var gFlagsLeft;
 
 function init(size = gSize) {
-    gSize = size;
+    gSize = size; // size of the matrix (4=4*4)
+    gBoard = buildBoard(size); // build board full oof EMPTY cells
+    printMat(gBoard, '.board-container'); // print matrix with all EMPTY cells
+    resetAll(); // reset things on init
     gGame.isOn = true;
-    changeSmile('play')
-    gBoard = buildBoard(size);
-    printMat(gBoard, '.board-container');
-    setFlagsLeft();
     console.table(gBoard);
+    changeSmile('play');
+    resetWatch();
+    setFlagsLeft();
+}
+
+function resetAll() {
+
     gGame = {
         isOn: false,
         shownCount: 0,
@@ -40,23 +41,27 @@ function init(size = gSize) {
         secsPassed: 0
     };
     clicksCounter = 0;
-    resetWatch();
+    clearInterval(gclockInterval);
+
 }
 
 function cellClicked(elCell) {
-    // start the clock on first click
+    if (!gGame.isOn) return; //to stop response after game ends
+
     if (clicksCounter === 0) { //start the clock
-        timeStart = Date.now();
-        stopWatch();
-        clicksCounter++;
-        renderMines(gSize);
-        setMinesNegsCount();
-        renderBoard();
+        gclockInterval = setInterval(stopWatch, 1000); // start the stopWatch on screen
+        clicksCounter++; //helps to now if it was the first click
+        renderMines(gSize); // create and render mines to the model and to the dom
+        setMinesNegsCount(); // check and update how many mines negs every EMPTY cell has
+        renderBoard(); //render the board after 
 
     }
 
     var cellClass = elCell.classList;
+    console.log('cellClass :>> ', cellClass);
     var location = getLocationFromClass(cellClass);
+    console.log('location :>> ', location);
+    console.log(gBoard[location.i][location.j]);
     if (gBoard[location.i][location.j].minesNegsCount === 0 && gBoard[location.i][location.j].content === EMPTY) revealNegs(location);
 
     if (gBoard[location.i][location.j].isFlagged) return;
@@ -69,7 +74,8 @@ function cellClicked(elCell) {
 }
 
 function flagCell(elCell) {
-    // console.log('mose right work');
+
+    if (!gGame.isOn) return;
     var cellClass = elCell.classList;
     var location = getLocationFromClass(cellClass);
     if (gFlagsLeft === 0 && !gBoard[location.i][location.j].isFlagged) return;
@@ -87,6 +93,7 @@ function flagCell(elCell) {
         document.querySelector('.flagsLeft span').innerText = gFlagsLeft;
         // renderCell(location);
     }
+    checkIfWIn();
 }
 
 function buildBoard(size = 4) {
@@ -110,6 +117,7 @@ function buildBoard(size = 4) {
 
 function gameOver() {
     //stop time
+    clearInterval(gclockInterval);
     //לרוץ על כל המערך, לשנות לכל המוקשים את האיז שואון לטרו ואז לרנדר
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[0].length; j++) {
@@ -123,10 +131,8 @@ function gameOver() {
     gGame.isOn = false;
     //change smile to sad
     changeSmile('lose');
-    timeEnd = Date.now();
-    h = 1;
-    stopWatch();
-    clearTimeout(gclockTimeout);
+    resetAll();
+    // gHelper = 1;
 }
 
 function checkIfWIn() {
@@ -142,9 +148,12 @@ function checkIfWIn() {
     //change smile to sunglasses
     changeSmile('win');
     timeEnd = Date.now();
-    checkBest();
-    h = 1;
-    stopWatch();
+    // checkBest();
+    // gHelper = 1;
+    clearInterval(gclockInterval);
+    gGame.isOn = false;
+    resetAll()
+
     return true;
 }
 
@@ -161,7 +170,7 @@ function renderCell(location) {
     if (cell.content !== MINE) {
         cell.isShown = true;
         elCell.innerHTML = cell.minesNegsCount;
-        elCell.classList += ' marked ';
+        elCell.classList += ' -marked ';
     } else {
         cell.isShown = true;
         elCell.innerHTML = MINE;
@@ -182,7 +191,6 @@ function setMinesNegsCount() {
             var location = { i: i, j: j };
             if (gBoard[i][j].content === EMPTY) {
                 var negsAmount = getMinesNegs(location);
-                // gBoard[i][j].content = negsAmount;
                 gBoard[i][j].minesNegsCount = negsAmount;
             }
         }
