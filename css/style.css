@@ -1,0 +1,89 @@
+body {
+    background-color: lightblue;
+}
+
+div {
+    margin: 10px;
+    display: block;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    height: 50px;
+}
+
+.radioBtns,
+.stopWatch,
+.nextNum,
+.flagsLeft {
+    background-color: rgb(223, 179, 35);
+    border-radius: 3px;
+    width: 300px;
+    height: 30px;
+    text-align: center;
+    border: solid yellow;
+    opacity: 0.9;
+    margin-left: 33%;
+}
+
+label {
+    /* padding: 10px; */
+    margin-right: 2px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    height: 100px;
+}
+
+.radioBtns {
+    width: 450px;
+    margin-left: 25%;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cell {
+    background-color: rgb(0, 119, 255);
+    border-radius: 4px;
+    text-align: center;
+    width: 29px;
+    height: 29px;
+    font-weight: bold;
+    /* font-size: 24px; */
+    font-size: 18px;
+    /* padding: 0;
+    margin: 0; */
+}
+
+.cell:hover {
+    background-color: rgb(140, 176, 243);
+    cursor: pointer;
+}
+
+.marked {
+    background-color: rgb(109, 171, 230);
+}
+
+.mineShown {
+    background-color: red;
+}
+
+.mineShown:hover {
+    background-color: red;
+}
+
+tr,
+td {
+    border: 3px solid blue;
+    padding: 0;
+}
+
+.smile {
+    cursor: pointer;
+}
+
+table {
+    border: 4px solid white;
+}
