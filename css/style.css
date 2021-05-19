@@ -1,6 +1,6 @@
 body {
     background-color: lightblue;
-    background-image: url(/img/israelFadeFlag.png);
+    background-image: url(../img/israelFadeFlag.png);
     height: 106vh;
     background-position: center;
     background-repeat: no-repeat;
@@ -9,15 +9,16 @@ body {
 
 div {
     margin: 10px;
-    /* display: block; */
-    font-size: 24px;
+    display: block;
+    font-size: 18px;
     font-weight: bold;
     text-align: center;
 }
 
 .radioBtns,
 .stopWatch,
-.flagsLeft {
+.flagsLeft,
+.bestScore {
     background-color: rgb(0, 119, 255);
     border-radius: 5px;
     text-align: center;
@@ -41,7 +42,7 @@ div {
 label {
     /* padding: 10px; */
     margin-right: 2px;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
     height: 100px;
@@ -56,11 +57,11 @@ table {
     background-color: rgb(0, 119, 255);
     border-radius: 4px;
     text-align: center;
-    width: 29px;
-    height: 29px;
+    width: 25px;
+    height: 25px;
     font-weight: bold;
     /* font-size: 24px; */
-    font-size: 18px;
+    font-size: 16px;
     /* padding: 0;
     margin: 0; */
 }
@@ -88,9 +89,13 @@ td {
     padding: 0;
 }
 
+.live {
+    height: 30px;
+}
+
 .smile {
     cursor: pointer;
-    border: 3px solid pink;
+    border: 3px solid rgb(71, 107, 224);
     border-radius: 3px;
     background-color: rgb(0, 119, 255);
     width: fit-content;
@@ -99,8 +104,42 @@ td {
     margin-right: auto;
     margin-top: auto;
     margin-bottom: auto;
+    font-size: 28px;
+    padding-top: 4px;
+    padding-right: 4px;
+    padding-left: 4px;
 }
 
 table {
-    border: 4px solid pink;
+    border: 6px solid rgb(71, 107, 224);
+    border-radius: 6px;
+}
+
+.warning:hover {
+    background-color: red;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    background-color: rgba(106, 145, 255, 255);
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.lamp1,
+.lamp2,
+.lamp3,
+.live {
+    font-size: 28px;
+}
+
+.lampOn {
+    color: transparent;
+    text-shadow: 0 0 0 yellow;
 }

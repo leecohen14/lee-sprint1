@@ -57,7 +57,7 @@ function getClassName(location) {
 
 var gclockInterval;
 var gHour, gMin, gSec, gHelper;
-var timeStart, timeEnd;
+var gTimeStart, gTimeEnd;
 
 function stopWatch() {
     if (gHour === 23 && gMin === 59 && gSec === 59) { //increasing the watch
@@ -95,6 +95,8 @@ function stopWatch() {
 
 }
 
+
+
 function resetWatch() { //reseting the watch and the counting
     gHour = 0;
     gMin = 0;
@@ -102,4 +104,91 @@ function resetWatch() { //reseting the watch and the counting
     gHelper = 0;
     document.querySelector(".stopWatch").innerText = '00:00:00';
     // clearInterval(gclockInterval);
+}
+
+function addClass(el, className) {
+    if (el.classList)
+        el.classList.add(className)
+    else if (!hasClass(el, className))
+        el.className += " " + className;
+}
+
+function removeClass(el, className) {
+    if (el.classList)
+        el.classList.remove(className)
+    else if (hasClass(el, className)) {
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className = el.className.replace(reg, ' ');
+    }
+}
+
+
+var gBestScore4;
+var gBestScore8;
+var gBestScore12;
+
+var gCurrScore;
+
+function getAndCheckScore() { //מחסרת את ההתחלה והסיום, ובודקת אם צריך לעדכן
+    gTimeEnd = Date.now();
+    gCurrScore = (gTimeEnd - gTimeStart) / 1000;
+    console.log('gTimeEnd-gTimeStart/1000 :>> ', gCurrScore);
+    checkIfNewBestScore();
+}
+
+function checkIfNewBestScore() {
+    switch (gSize) {
+        case 4:
+            if (gCurrScore < gBestScore4 || +gBestScore4 === 0) {
+                console.log('local works!');
+
+                localStorage.setItem('bestScore4', gCurrScore);
+            }
+            break;
+        case 8:
+            if (gCurrScore < gBestScore8 || +gBestScore8 === 0) {
+                localStorage.setItem('bestScore8', gCurrScore);
+            }
+            break;
+        case 12:
+            if (gCurrScore < gBestScore12 || +gBestScore12 === 0) {
+                localStorage.setItem('bestScore12', gCurrScore);
+            }
+            break;
+    }
+    checkLocalStorage(); //to update dom
+
+}
+
+function checkLocalStorage() {
+    //part1: check if there is something in local storage - if not put zero.
+    if (!localStorage.getItem(`bestScore4`)) { //if empty
+        localStorage.setItem(`bestScore4`, 0);
+    } else {
+        gBestScore4 = localStorage.getItem(`bestScore4`)
+    }
+
+    if (!localStorage.getItem(`bestScore8`)) { //if empty
+        localStorage.setItem(`bestScore8`, 0);
+    } else {
+        gBestScore8 = localStorage.getItem(`bestScore8`)
+    }
+
+    if (!localStorage.getItem(`bestScore12`)) { //if empty
+        localStorage.setItem(`bestScore12`, 0);
+    } else {
+        gBestScore12 = localStorage.getItem(`bestScore12`)
+    }
+
+    switch (gSize) { //update the dome due to the current level
+        case 4:
+            document.querySelector('.bestScoreSpan').innerText = gBestScore4;
+            break;
+        case 8:
+            document.querySelector('.bestScoreSpan').innerText = gBestScore8;
+            break;
+        case 12:
+            document.querySelector('.bestScoreSpan').innerText = gBestScore12;
+            break;
+    }
 }

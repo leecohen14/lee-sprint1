@@ -5,6 +5,8 @@ noRightClick.addEventListener("contextmenu", e => e.preventDefault());
 const FLAG = '🇮🇱';
 const EMPTY = '';
 const MINE = '💣';
+const LIVES = '💛';
+const LAMP = '💡';
 
 var gGame = {
     isOn: false,
@@ -12,13 +14,91 @@ var gGame = {
     markedCount: 0,
     secsPassed: 0
 }
+var gLives = 3;
+var gLivesStr = LIVES + LIVES + LIVES;
+document.querySelector('.livesSpan').innerText = gLivesStr;
 
+var gHints = 3;
+var gHintMode = false;
+
+var gElLamp;
 var gBoard;
 
 var clicksCounter = 0; //helps to indicate the first click
 
 var gSize = 4;
 var gFlagsLeft;
+
+function hintOn(elLamp) {
+    gElLamp = elLamp;
+    if (gHints === 0) return;
+    gHintMode = true;
+    // show hint
+
+    // add lampOn class 
+    lampLightOn(elLamp);
+    // clean inner text after 1 second
+
+    // hide the hint
+    // whattodo??
+
+}
+
+function lampLightOn(elLamp) {
+    addClass(elLamp, 'lampOn');
+
+
+}
+
+function showHintCells(location) {
+    //negs loop , change the html to the content or negsnum and render back the board
+    var cellsArr = [];
+    var iIdx = location.i;
+    var jIdx = location.j;
+    for (var i = 0; i < 3; i++) {
+        if (!(iIdx - 1 + i >= 0 && iIdx - 1 + i <= gBoard.length - 1)) continue;
+        for (var j = 0; j < 3; j++) {
+            if (!(jIdx - 1 + j >= 0 && jIdx - 1 + j <= gBoard[0].length - 1)) continue;
+            if (!gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown) {
+                cellsArr.push({ i: iIdx - 1 + i, j: jIdx - 1 + j });
+                gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown = true;
+                renderCell({ i: iIdx - 1 + i, j: jIdx - 1 + j });
+                console.log('cells rendered');
+
+
+            }
+        }
+    }
+    renderBoard();
+    setTimeout(() => {
+
+        cleanHintCells(cellsArr);
+    }, 1000)
+    gHintMode = false;
+}
+
+function cleanHintCells(cellsArr) {
+    for (var i = 0; i < cellsArr.length; i++) {
+        console.log('cellsArr[i].j :>> ', cellsArr[i].j);
+        gBoard[cellsArr[i].i][cellsArr[i].j].isShown = false;
+    }
+    renderBoard();
+    removeClass(gElLamp, 'lampOn');
+    gElLamp.innerHTML = '';
+}
+
+function resetLamps() {
+    document.querySelector('.lamp1').innerText = '💡';
+    document.querySelector('.lamp2').innerText = '💡';
+    document.querySelector('.lamp3').innerText = '💡';
+    gHints = 3;
+}
+
+function resetLives() {
+    document.querySelector('.livesSpan').innerText = '💛💛💛';
+    gLives = 3;
+}
+
 
 function init(size = gSize) {
     gSize = size; // size of the matrix (4=4*4)
@@ -30,6 +110,7 @@ function init(size = gSize) {
     changeSmile('play');
     resetWatch();
     setFlagsLeft();
+    checkLocalStorage();
 }
 
 function resetAll() {
@@ -43,12 +124,26 @@ function resetAll() {
     clicksCounter = 0;
     clearInterval(gclockInterval);
 
+    resetLamps();
+    resetLives();
+
 }
 
+
 function cellClicked(elCell) {
+    var cellClass = elCell.classList;
+    var location = getLocationFromClass(cellClass);
     if (!gGame.isOn) return; //to stop response after game ends
 
+    if (gHintMode) {
+        showHintCells(location);
+        console.log(' show hint cells is on');
+        return;
+    }
+
     if (clicksCounter === 0) { //start the clock
+        gTimeStart = Date.now();
+        console.log('gTimeStart :>> ', gTimeStart);
         gclockInterval = setInterval(stopWatch, 1000); // start the stopWatch on screen
         clicksCounter++; //helps to now if it was the first click
         renderMines(gSize); // create and render mines to the model and to the dom
@@ -57,21 +152,38 @@ function cellClicked(elCell) {
 
     }
 
-    var cellClass = elCell.classList;
-    console.log('cellClass :>> ', cellClass);
-    var location = getLocationFromClass(cellClass);
-    console.log('location :>> ', location);
-    console.log(gBoard[location.i][location.j]);
     if (gBoard[location.i][location.j].minesNegsCount === 0 && gBoard[location.i][location.j].content === EMPTY) revealNegs(location);
 
     if (gBoard[location.i][location.j].isFlagged) return;
     // if (cellContent === EMPTY) {
     //     renderCell(location);
     // }
-    if (gBoard[location.i][location.j].content === MINE) gameOver();
-    renderCell(location);
+    if (gBoard[location.i][location.j].content === MINE) {
+        if (gLives > 0) {
+            updateGLives();
+            warningColor(elCell); // when hit a mine and still have life
+
+        } else {
+            renderCell(location);
+            gameOver();
+
+        }
+
+    } else {
+        renderCell(location);
+    }
+
     checkIfWIn();
 }
+
+function warningColor(elCell) {
+    addClass(elCell, 'warning');
+    setTimeout(() => {
+        removeClass(elCell, 'warning')
+    }, 1500)
+}
+
+
 
 function flagCell(elCell) {
 
@@ -114,6 +226,23 @@ function buildBoard(size = 4) {
 }
 
 
+function updateGLives() {
+    gLives--;
+    switch (gLives) {
+        case 0:
+            gLivesStr = '';
+            break;
+        case 1:
+            gLivesStr = '💛';
+            break;
+        case 2:
+            gLivesStr = '💛💛';
+            break;
+
+    }
+
+    document.querySelector('.livesSpan').innerText = gLivesStr;
+}
 
 function gameOver() {
     //stop time
@@ -131,8 +260,9 @@ function gameOver() {
     gGame.isOn = false;
     //change smile to sad
     changeSmile('lose');
+    getAndCheckScore();
+
     resetAll();
-    // gHelper = 1;
 }
 
 function checkIfWIn() {
@@ -147,7 +277,7 @@ function checkIfWIn() {
     console.log('win :>> ');
     //change smile to sunglasses
     changeSmile('win');
-    timeEnd = Date.now();
+    getAndCheckScore();
     // checkBest();
     // gHelper = 1;
     clearInterval(gclockInterval);
