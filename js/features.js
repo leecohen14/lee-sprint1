@@ -40,7 +40,7 @@ function onSafeClick() {
         addClass(elCell, 'safe');
         setInterval(() => {
             removeClass(elCell, 'safe');
-        }, 1500);
+        }, 700);
         gSafeClicksLeft--;
         document.querySelector('.safeClickSpan').innerText = gSafeClicksLeft;
         if (gSafeClicksLeft === 0) {
@@ -54,6 +54,7 @@ function onSafeClick() {
 
 function hintOn(elLamp) {
     gElLamp = elLamp;
+    if (gElLamp.disabled) return;
     if (gHints === 0) return;
     gHintMode = true;
     // show hint
@@ -69,6 +70,7 @@ function hintOn(elLamp) {
 
 function lampLightOn(elLamp) {
     addClass(elLamp, 'lampOn');
+    elLamp.disabled = true;
 
 
 }
@@ -104,7 +106,16 @@ function cleanHintCells(cellsArr) {
     }
     renderBoard();
     removeClass(gElLamp, 'lampOn');
-    gElLamp.innerHTML = '';
+    addClass(gElLamp, 'lampOff')
+}
+
+function removeAllLampsOffClass() {
+    for (var i = 1; i <= 3; i++) {
+        var elLamp = document.querySelector(`.lamp${i}`);
+        removeClass(elLamp, 'lampOff');
+        elLamp.disabled = false;
+
+    }
 }
 
 function warningColor(elCell) {

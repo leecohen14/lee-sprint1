@@ -55,6 +55,7 @@ function resetAll() {
     setFlagsLeft(); // set in the span how many flags should be used
     gManualMode = false;
     gMines = [];
+    removeAllLampsOffClass();
 }
 
 function cellClicked(elCell) {
@@ -106,7 +107,7 @@ function flagCell(elCell) {
     var cellClass = elCell.classList;
     var location = getLocationFromClass(cellClass);
     var currCell = gBoard[location.i][location.j]; //wasnt sure if this way is a deep copy or only a pointer- CHECK LATER
-    if (gFlagsLeft === 0 && !currCell.isFlagged) return; //if is trying to flage an unflagged cell and no flags left
+    if ((gFlagsLeft === 0 && !currCell.isFlagged) || currCell.isShown || gManualMode) return; //if is trying to flage an unflagged cell and no flags left
 
     gBoard[location.i][location.j].isFlagged = !currCell.isFlagged; //flag cell if is unflagged and unflagged if is flagged
     var cellIsFlagged = gBoard[location.i][location.j].isFlagged;
@@ -158,7 +159,6 @@ function gameOver() {
     changeSmile('lose'); //change smile to sad
     gGame.isOn = false;
     // getAndCheckScore();
-    resetAll();
 }
 
 function checkIfWIn() {

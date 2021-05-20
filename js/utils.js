@@ -146,19 +146,21 @@ function checkIfNewBestScore() {
     switch (gSize) {
         case 4:
             if (gCurrScore < gBestScore4 || +gBestScore4 === 0) {
-                console.log('local works!');
-
                 localStorage.setItem('bestScore4', gCurrScore);
+                console.log('new best record!');
+
             }
             break;
         case 8:
             if (gCurrScore < gBestScore8 || +gBestScore8 === 0) {
                 localStorage.setItem('bestScore8', gCurrScore);
+                console.log('new best record!');
             }
             break;
         case 12:
             if (gCurrScore < gBestScore12 || +gBestScore12 === 0) {
                 localStorage.setItem('bestScore12', gCurrScore);
+                console.log('new best record!');
             }
             break;
     }
@@ -195,7 +197,6 @@ function firstCheckLocalStorage() {
 function updateBestScoreDom() {
     switch (gSize) { //update the dom due to the current level
         case 4:
-            console.log('gBestScore4 :>> ', gBestScore4);
             document.querySelector('.bestScoreSpan').innerText = gBestScore4;
             break;
         case 8:

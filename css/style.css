@@ -20,7 +20,7 @@ div {
     /* background-color: rgb(248, 187, 19); */
     border-radius: 5px;
     text-align: center;
-    border: solid black;
+    border: 2px solid black;
     margin-left: auto;
     margin-right: auto;
     /* width: fit-content; */
@@ -154,11 +154,11 @@ button:disabled {
 }
 
 .safe {
-    background-color: lightgreen;
+    background-color: rgb(163, 108, 26);
 }
 
 .safe:hover {
-    background-color: lightgreen;
+    background-color: rgb(163, 108, 26);
 }
 
 footer {
@@ -195,6 +195,12 @@ footer {
 .lampOn {
     color: transparent;
     text-shadow: 0 0 0 yellow;
+}
+
+.lampOff {
+    color: transparent;
+    text-shadow: 0 0 0 black;
+    cursor: initial;
 }
 
 .manualMine {
