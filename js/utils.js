@@ -15,7 +15,8 @@ function printMat(mat, selector) {
             }
 
             if (cell.isShown && cellContent === EMPTY) {
-                strHTML += `${cellMinesNegsCount}</td>`;
+                if (cell.minesNegsCount === 0) strHTML += ` </td>`;
+                else strHTML += `${cellMinesNegsCount}</td>`;
             }
 
             if (!cell.isShown && cellContent === EMPTY) strHTML += `${cellContent}</td>`;
@@ -36,6 +37,28 @@ function printMat(mat, selector) {
     elContainer.innerHTML = strHTML;
 }
 
+function buildBoard(size = 4) {
+    var board = [];
+    for (var i = 0; i < size; i++) {
+        board.push([]);
+        for (var j = 0; j < size; j++) {
+            board[i][j] = {
+                content: EMPTY,
+                isShown: false,
+                isFlagged: false,
+                minesNegsCount: 0
+            };
+        }
+    }
+    return board;
+}
+
+//--------- get location, random colors, random int, and classes name
+function getLocationFromClass(cellClass) {
+    var arr = cellClass.value.split('-');
+    var location = { i: +arr[1], j: +arr[2] };
+    return location;
+}
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -55,6 +78,7 @@ function getClassName(location) {
     return cellClass;
 }
 
+// -------- stop Watch stuffs ---------------
 var gclockInterval;
 var gHour, gMin, gSec, gHelper;
 var gTimeStart, gTimeEnd;
@@ -95,34 +119,15 @@ function stopWatch() {
 
 }
 
-
-
 function resetWatch() { //reseting the watch and the counting
     gHour = 0;
     gMin = 0;
     gSec = 0;
     gHelper = 0;
     document.querySelector(".stopWatch").innerText = '00:00:00';
-    // clearInterval(gclockInterval);
 }
 
-function addClass(el, className) {
-    if (el.classList)
-        el.classList.add(className)
-    else if (!hasClass(el, className))
-        el.className += " " + className;
-}
-
-function removeClass(el, className) {
-    if (el.classList)
-        el.classList.remove(className)
-    else if (hasClass(el, className)) {
-        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-        el.className = el.className.replace(reg, ' ');
-    }
-}
-
-
+//------ local storage and updating dom on best record --------
 var gBestScore4;
 var gBestScore8;
 var gBestScore12;
@@ -156,32 +161,40 @@ function checkIfNewBestScore() {
             }
             break;
     }
-    checkLocalStorage(); //to update dom
+    firstCheckLocalStorage(); //to update dom
 
 }
 
-function checkLocalStorage() {
+function firstCheckLocalStorage() {
     //part1: check if there is something in local storage - if not put zero.
     if (!localStorage.getItem(`bestScore4`)) { //if empty
         localStorage.setItem(`bestScore4`, 0);
+        gBestScore4 = localStorage.getItem(`bestScore4`);
     } else {
-        gBestScore4 = localStorage.getItem(`bestScore4`)
+        gBestScore4 = localStorage.getItem(`bestScore4`);
     }
 
     if (!localStorage.getItem(`bestScore8`)) { //if empty
         localStorage.setItem(`bestScore8`, 0);
+        gBestScore8 = localStorage.getItem(`bestScore8`);
+
     } else {
-        gBestScore8 = localStorage.getItem(`bestScore8`)
+        gBestScore8 = localStorage.getItem(`bestScore8`);
     }
 
     if (!localStorage.getItem(`bestScore12`)) { //if empty
         localStorage.setItem(`bestScore12`, 0);
+        gBestScore8 = localStorage.getItem(`bestScore8`);
     } else {
-        gBestScore12 = localStorage.getItem(`bestScore12`)
+        gBestScore12 = localStorage.getItem(`bestScore12`);
     }
 
-    switch (gSize) { //update the dome due to the current level
+}
+
+function updateBestScoreDom() {
+    switch (gSize) { //update the dom due to the current level
         case 4:
+            console.log('gBestScore4 :>> ', gBestScore4);
             document.querySelector('.bestScoreSpan').innerText = gBestScore4;
             break;
         case 8:
@@ -190,5 +203,21 @@ function checkLocalStorage() {
         case 12:
             document.querySelector('.bestScoreSpan').innerText = gBestScore12;
             break;
+    }
+}
+//------ remove and add classes--------
+function addClass(el, className) {
+    if (el.classList)
+        el.classList.add(className)
+    else if (!hasClass(el, className))
+        el.className += " " + className;
+}
+
+function removeClass(el, className) {
+    if (el.classList)
+        el.classList.remove(className)
+    else if (hasClass(el, className)) {
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className = el.className.replace(reg, ' ');
     }
 }

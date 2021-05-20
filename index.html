@@ -10,27 +10,31 @@
 </head>
 
 <body onload="init()">
-
-    <div class="radioBtns">
-        <input type="radio" onclick="init(4)" checked="checked" class="radio" data-size="16" name="level">
-        <label for="male">easy(4*4)</label>
-        <input type="radio" onclick="init(8)" class="radio" data-size="64" name="level">
-        <label for="male">medium(8*8)</label>
-        <input type="radio" onclick="init(12)" class="radio" data-size="144" name="level">
-        <label for="male">hard(12*12)</label>
+    <div>
+        <div class="radioBtns">
+            <input type="radio" onclick="init(4)" checked="checked" class="radio" data-size="16" name="level">
+            <label for="male">easy(16)</label>
+            <input type="radio" onclick="init(8)" class="radio" data-size="64" name="level">
+            <label for="male">medium(64)</label>
+            <input type="radio" onclick="init(12)" class="radio" data-size="144" name="level">
+            <label for="male">hard(144)</label>
+        </div>
+        <div class="bestScore">The best score is: <span class="bestScoreSpan"></span></div>
     </div>
-    <div class="bestScore">The best score is: <span class="bestScoreSpan"></span></div>
-    <div class="stopWatch">00:00:00</div>
-    <div class="flagsLeft">🇮🇱 Left: <span></span> </div>
-    <div class="lamp">
-        <span class="lamp1" onclick="hintOn(this)">💡</span>
-        <span class="lamp2" onclick="hintOn(this)">💡</span>
-        <span class="lamp3" onclick="hintOn(this)">💡</span>
+    <div>
+        <div class="stopWatch">00:00:00</div>
+        <div class="flagsLeft">🇮🇱 Left: <span></span> </div>
+        <div class="lamp">
+            <span class="lamp1" onclick="hintOn(this)">💡</span>
+            <span class="lamp2" onclick="hintOn(this)">💡</span>
+            <span class="lamp3" onclick="hintOn(this)">💡</span>
+        </div>
+        <div class="live"><span class="livesSpan"></span></div>
+        <div>
+            <button onclick="onSafeClick()">Safe Click (<span class="safeClickSpan"></span>)</button>
+            <button class="undoBtn" onclick="onUndo()">UNDO</button>
+        </div>
     </div>
-    <div class="live"><span class="livesSpan"></span></div>
-    <button onclick="onSafeClick()">Safe Click (<span class="safeClickSpan"></span>)</button>
-    <button class="undoBtn" onclick="onUndo()">UNDO</button>
-
     <div class="smile" onclick="init()"><span class="modeImage">😀</span></div>
     <div class="board-container"></div>
 
@@ -38,12 +42,13 @@
 
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/reset-functions.js"></script>
+    <script src="js/features.js"></script>
     <script src="js/mine.js"></script>
-    <script src="js/negs-reveal.js"></script>
 
 
 </body>
 
-<footer>lee cohen class 1</footer>
+<footer>lee cohen class 1 - מבחני קבלה הנדסה קרבית</footer>
 
 </html>

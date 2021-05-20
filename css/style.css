@@ -1,13 +1,11 @@
 body {
-    background-color: rgb(19, 202, 248);
-    /* background-image: url(/img/israelFadeFlag.png); */
-    height: 106vh;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-color: rgb(248, 187, 19);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: black;
 }
 
 div {
+    background-color: rgb(248, 187, 19);
     margin: 5px;
     display: block;
     font-size: 18px;
@@ -19,14 +17,15 @@ div {
 .stopWatch,
 .flagsLeft,
 .bestScore {
-    background-color: rgb(0, 119, 255);
+    /* background-color: rgb(248, 187, 19); */
     border-radius: 5px;
     text-align: center;
-    border: solid white;
+    border: solid black;
     margin-left: auto;
     margin-right: auto;
     /* width: fit-content; */
     padding: 2px;
+    display: inline-block;
 }
 
 .radioBtns,
@@ -56,25 +55,25 @@ table {
 }
 
 .cell {
-    background-color: rgb(0, 119, 255);
+    background-color: rgb(248, 187, 19);
     border-radius: 4px;
     text-align: center;
-    width: 18px;
-    height: 18px;
+    width: 26px;
+    height: 26px;
     font-weight: bold;
     /* font-size: 24px; */
     font-size: 16px;
-    padding: 0;
-    margin: 0;
+    padding: 0px;
+    margin: 0px;
 }
 
 .cell:hover {
-    background-color: rgb(140, 176, 243);
+    background-color: lightgray;
     cursor: pointer;
 }
 
 .-marked {
-    background-color: rgb(109, 171, 230);
+    background-color: lightgray;
 }
 
 .mineShown {
@@ -87,7 +86,7 @@ table {
 
 tr,
 td {
-    border: 3px solid blue;
+    border: 1px solid white;
     padding: 0;
 }
 
@@ -97,9 +96,8 @@ td {
 
 .smile {
     cursor: pointer;
-    border: 3px solid white;
+    border: 3px solid black;
     border-radius: 3px;
-    background-color: rgb(0, 119, 255);
     width: fit-content;
     height: fit-content;
     margin-left: auto;
@@ -113,30 +111,27 @@ td {
 }
 
 table {
-    border: 6px solid white;
+    border: 3px solid black;
     border-radius: 6px;
+    background-color: black;
 }
 
 button {
-    background-color: rgb(0, 119, 255);
+    background-color: rgb(248, 187, 19);
     border-radius: 3px;
-    border: 2px solid white;
+    border: 2px solid black;
     font-weight: bold;
     padding: 3px;
     cursor: pointer;
     /* margin-left: 16%; */
-    float: left;
     margin-bottom: 5px;
+    text-align: center;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-.undoBtn {
-    /* margin-left: 21.5%; */
-    float: left;
-    margin-left: 10px;
-}
-
-button:hover {
-    background-color: lightgreen;
+button:hover,
+.smile:hover {
+    background-color: rgb(240, 215, 77);
 }
 
 button:disabled {
@@ -166,7 +161,8 @@ footer {
     bottom: 0;
     width: 100%;
     height: 30px;
-    background-color: rgb(0, 119, 255);
+    background-color: black;
+    color: rgb(248, 187, 19);
     color: white;
     text-align: center;
     font-size: 24px;
@@ -178,7 +174,6 @@ footer {
 .lamp2,
 .lamp3 {
     font-size: 28px;
-    float: left;
 }
 
 .lamp1:hover,
@@ -189,7 +184,6 @@ footer {
 
 .live {
     font-size: 28px;
-    float: right;
 }
 
 .lampOn {
