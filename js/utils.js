@@ -44,6 +44,7 @@ function buildBoard(size = 4) {
         for (var j = 0; j < size; j++) {
             board[i][j] = {
                 content: EMPTY,
+                location: { i, j },
                 isShown: false,
                 isFlagged: false,
                 minesNegsCount: 0

@@ -1,13 +1,28 @@
 'use strict'
 
 function onUndo() {
-
-    // console.log('gLastBoards - should be 2 :>> ', gLastBoards);
-    // var lastBoard = gLastBoards.pop();
-    // console.log('lastBoard:>> ', lastBoard);
-    // gBoard = lastBoard.slice();
-    // // gCopyGBoard = gBoard
+    console.log('tried to undo :>> ');
+    //--- DIDNT WORK WELL ----
+    // console.log(gLastBoards);
+    // copy to gBoard
+    // copyBoard(gLastBoards[gLastBoards.length - 1], gBoard);
     // renderBoard();
+}
+
+function copyBoard(fromBoard, toBoard) { //deep copy array to array
+    toBoard = [];
+    for (var i = 0; i < fromBoard.length; i++) {
+        toBoard[i] = [];
+        for (var j = 0; j < fromBoard[0].length; j++) {
+            toBoard[i][j] = {
+                content: fromBoard[i][j].content,
+                location: { i: fromBoard[i][j].location.i, j: fromBoard[i][j].location.j },
+                isShown: fromBoard[i][j].isShown,
+                isFlagged: fromBoard[i][j].isFlagged,
+                minesNegsCount: fromBoard[i][j].minesNegsCount
+            };
+        }
+    }
 }
 
 function onSafeClick() {
@@ -85,7 +100,6 @@ function showHintCells(location) {
 
 function cleanHintCells(cellsArr) {
     for (var i = 0; i < cellsArr.length; i++) {
-        console.log('cellsArr[i].j :>> ', cellsArr[i].j);
         gBoard[cellsArr[i].i][cellsArr[i].j].isShown = false;
     }
     renderBoard();

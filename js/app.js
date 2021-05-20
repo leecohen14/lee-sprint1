@@ -30,6 +30,7 @@ var gSize = 4;
 var gFlagsLeft;
 var gSafeClicksLeft;
 
+
 function init(size = gSize) {
     gSize = size; // size of the matrix (4=4*4)
     resetAll(); // reset things on init -- this is after gZie=size cause it depends on it
@@ -52,13 +53,16 @@ function resetAll() {
     resetSafeClicks(); //rest safe click counter and able the btn back
     resetWatch(); //reset watch variables
     setFlagsLeft(); // set in the span how many flags should be used
+    gManualMode = false;
+    gMines = [];
 }
 
 function cellClicked(elCell) {
     if (!gGame.isOn) return; //to stop response after game ends
-
-    // gLastMoves.push(gBoard);
-    // console.log('gLastMoves :>> ', gLastMoves);
+    if (gManualMode) {
+        cellClickedInManualMode(elCell);
+        return;
+    }
     var cellClass = elCell.classList;
     var location = getLocationFromClass(cellClass);
     var currCell = gBoard[location.i][location.j];
@@ -66,11 +70,10 @@ function cellClicked(elCell) {
         gTimeStart = Date.now();
         gclockInterval = setInterval(stopWatch, 1000); // start the stopWatch on screen
         clicksCounter++; //helps to now if it was the first click
-        renderMines(gSize); // create and render mines to the model and to the dom
+        if (gMines.length === 0) {
+            renderMines(gSize); // create and render mines to the model and to the dom
+        }
         setMinesNegsCount(); // check and update how many mines negs every EMPTY cell has
-        // renderBoard(); //render the board after
-    } else {
-
     }
 
     if (gHintMode) { // if clicked for show a hint
@@ -95,7 +98,6 @@ function cellClicked(elCell) {
         renderCell(location);
         checkIfWIn(); //if reveal the last empty cell and all the flags set correctly than should check win
     }
-
 }
 
 function flagCell(elCell) {
@@ -137,8 +139,8 @@ function renderCell(location) {
     }
 }
 
-function renderBoard() {
-    printMat(gBoard, '.board-container');
+function renderBoard(board = gBoard) {
+    printMat(board, '.board-container');
 }
 
 function gameOver() {

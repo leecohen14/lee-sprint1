@@ -40,6 +40,12 @@ div {
     height: fit-content;
 }
 
+.stopWatch {
+    font-size: 22px;
+    height: 28px;
+    padding-bottom: 1px;
+}
+
 label {
     /* padding: 10px; */
     margin-right: 2px;
@@ -189,4 +195,12 @@ footer {
 .lampOn {
     color: transparent;
     text-shadow: 0 0 0 yellow;
+}
+
+.manualMine {
+    background-color: red;
+}
+
+.manualMine:hover {
+    background-color: red;
 }
