@@ -28,6 +28,43 @@ var clicksCounter = 0; //helps to indicate the first click
 
 var gSize = 4;
 var gFlagsLeft;
+var gSafeClicksLeft;
+var gLastMoves = [];
+
+function onUndo() {
+    console.log(' undo accourd ');
+    var lastMove = gLastMoves.pop();
+    gBoard = lastMove;
+    renderBoard();
+}
+
+
+function onSafeClick() {
+    if (gSafeClicksLeft === 0) return; //later just disable the button after 3rd click
+
+    var location = {
+        i: getRandomIntInclusive(0, gBoard.length - 1),
+        j: getRandomIntInclusive(0, gBoard[0].length - 1)
+    }
+
+    if (gBoard[location.i][location.j].content === EMPTY) {
+        //do
+        var elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
+        console.log('elCell :>> ', elCell);
+        addClass(elCell, 'safe');
+        setInterval(() => {
+            removeClass(elCell, 'safe');
+        }, 1500);
+        gSafeClicksLeft--;
+        document.querySelector('.safeClickSpan').innerText = gSafeClicksLeft;
+        if (gSafeClicksLeft === 0) {
+            document.querySelector('button').disabled = true;
+        }
+
+    } else {
+        onSafeClick();
+    }
+}
 
 function hintOn(elLamp) {
     gElLamp = elLamp;
@@ -127,10 +164,17 @@ function resetAll() {
     resetLamps();
     resetLives();
 
+    gSafeClicksLeft = 3;
+    document.querySelector('.safeClickSpan').innerText = gSafeClicksLeft;
+    document.querySelector('button').disabled = false;
+
+    gLastMoves = [];
+
 }
 
 
 function cellClicked(elCell) {
+    // console.log('cellclikced\n', gBoard);
     var cellClass = elCell.classList;
     var location = getLocationFromClass(cellClass);
     if (!gGame.isOn) return; //to stop response after game ends
@@ -172,6 +216,8 @@ function cellClicked(elCell) {
     } else {
         renderCell(location);
     }
+    gLastMoves.push(gBoard); //push after board rendered
+
 
     checkIfWIn();
 }
@@ -180,7 +226,7 @@ function warningColor(elCell) {
     addClass(elCell, 'warning');
     setTimeout(() => {
         removeClass(elCell, 'warning')
-    }, 1500)
+    }, 1000)
 }
 
 
