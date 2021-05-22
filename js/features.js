@@ -1,12 +1,17 @@
 'use strict'
 
 function onUndo() {
-    console.log('tried to undo :>> ');
-    //--- DIDNT WORK WELL ----
-    // console.log(gLastBoards);
-    // copy to gBoard
-    // copyBoard(gLastBoards[gLastBoards.length - 1], gBoard);
-    // renderBoard();
+    clicksCounter--;
+    popState()
+    var board = popState();
+    gBoard = _.cloneDeep(board);
+    renderBoard(board);
+}
+
+function undoBtnMode() {
+    if (gState.length < 2) {
+        document.querySelector('.undoBtn').disabled = true;
+    } else document.querySelector('.undoBtn').disabled = false;
 }
 
 function copyBoard(fromBoard, toBoard) { //deep copy array to array
@@ -36,11 +41,10 @@ function onSafeClick() {
     if (gBoard[location.i][location.j].content === EMPTY && !gBoard[location.i][location.j].isShown) {
         //do
         var elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
-        console.log('elCell :>> ', elCell);
         addClass(elCell, 'safe');
-        setInterval(() => {
+        setTimeout(() => {
             removeClass(elCell, 'safe');
-        }, 700);
+        }, 500);
         gSafeClicksLeft--;
         document.querySelector('.safeClickSpan').innerText = gSafeClicksLeft;
         if (gSafeClicksLeft === 0) {
@@ -57,15 +61,7 @@ function hintOn(elLamp) {
     if (gElLamp.disabled) return;
     if (gHints === 0) return;
     gHintMode = true;
-    // show hint
-
-    // add lampOn class 
     lampLightOn(elLamp);
-    // clean inner text after 1 second
-
-    // hide the hint
-    // whattodo??
-
 }
 
 function lampLightOn(elLamp) {
@@ -87,17 +83,19 @@ function showHintCells(location) {
             if (!gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown) {
                 cellsArr.push({ i: iIdx - 1 + i, j: jIdx - 1 + j });
                 gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown = true;
-                renderCell({ i: iIdx - 1 + i, j: jIdx - 1 + j });
+                updateCellInModel({ i: iIdx - 1 + i, j: jIdx - 1 + j });
                 console.log('cells rendered');
             }
         }
     }
     renderBoard();
+    popState();
+    document.querySelector('.undoBtn').disabled = true;
     setTimeout(() => {
 
         cleanHintCells(cellsArr);
+        document.querySelector('.undoBtn').disabled = false;
     }, 1000)
-    gHintMode = false;
 }
 
 function cleanHintCells(cellsArr) {
@@ -105,8 +103,12 @@ function cleanHintCells(cellsArr) {
         gBoard[cellsArr[i].i][cellsArr[i].j].isShown = false;
     }
     renderBoard();
+    popState();
     removeClass(gElLamp, 'lampOn');
     addClass(gElLamp, 'lampOff')
+    clicksCounter--; // we click to choose which cell negs to present and it isnt suppose to count as a click!
+    gHintMode = false;
+
 }
 
 function removeAllLampsOffClass() {
@@ -187,7 +189,7 @@ function changeSmile(mode) {
     }
 }
 
-function setFlagsLeft() {
+function initFlagsLeft() {
 
     switch (gSize) {
         case 4:
@@ -204,6 +206,24 @@ function setFlagsLeft() {
 
 }
 
+function updateFlagsLeft() {
+    //count mines every render
+    var countMines = 0;
+    var countFlags = 0;
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            if (gBoard[i][j].content === MINE) countMines++;
+            if (gBoard[i][j].isFlagged) countFlags++;
+        }
+    }
+    gFlagsLeft = countMines - countFlags;
+    if (clicksCounter === 0 && gFlagsLeft === 0 || countMines === 0) {
+        initFlagsLeft();
+        gFlagsLeft -= countFlags;
+    }
+    document.querySelector('.flagsLeft span').innerText = gFlagsLeft;
+}
+
 function revealNegs(location) {
     var iIdx = location.i;
     var jIdx = location.j;
@@ -216,14 +236,12 @@ function revealNegs(location) {
             if (checkedCell.content === MINE) return;
             if (checkedCell.content === EMPTY) {
                 if (checkedCell.minesNegsCount === 0) {
-                    // gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown = true;
                     if (checkedCell.isShown) continue;
-                    renderCell(currCellLocation);
+                    updateCellInModel(currCellLocation);
                     if (currCellLocation.i === location.i && currCellLocation.j === location.j) continue;
                     revealNegs(currCellLocation);
                 } else {
-                    gBoard[iIdx - 1 + i][jIdx - 1 + j].isShown = true;
-                    renderCell(currCellLocation);
+                    updateCellInModel(currCellLocation);
 
                 }
             }

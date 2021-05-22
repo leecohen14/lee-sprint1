@@ -2,11 +2,30 @@
 const noRightClick = document.querySelector(".board-container"); // to use right click
 noRightClick.addEventListener("contextmenu", e => e.preventDefault());
 
+//const symbols
 const FLAG = '🇮🇱';
 const EMPTY = '';
 const MINE = '💣';
 const LIVES = '🖤';
 const LAMP = '💡';
+
+var gBoard;
+var clicksCounter = 0; //helps to indicate the first click and if we should render the first board when using undo
+var gSize = 4; //size of mat 4 => 4*4
+var gFlagsLeft; // how many flags left to place on board
+
+// --lives feature
+var gLives = 3; //lives feature
+var gLivesStr = LIVES + LIVES + LIVES;
+document.querySelector('.livesSpan').innerText = gLivesStr;
+
+// --hints feature
+var gHints = 3; //hints feature
+var gHintMode = false;
+var gElLamp; //current used lamp on hints
+
+// --safe clicks feature
+var gSafeClicksLeft; // safe clicks feature
 
 var gGame = {
     isOn: false,
@@ -14,28 +33,12 @@ var gGame = {
     markedCount: 0,
     secsPassed: 0
 }
-var gLives = 3;
-var gLivesStr = LIVES + LIVES + LIVES;
-document.querySelector('.livesSpan').innerText = gLivesStr;
-
-var gHints = 3;
-var gHintMode = false;
-
-var gElLamp;
-var gBoard;
-
-var clicksCounter = 0; //helps to indicate the first click
-
-var gSize = 4;
-var gFlagsLeft;
-var gSafeClicksLeft;
-
 
 function init(size = gSize) {
     gSize = size; // size of the matrix (4=4*4)
     resetAll(); // reset things on init -- this is after gZie=size cause it depends on it
     gBoard = buildBoard(size); // build board full oof EMPTY cells
-    printMat(gBoard, '.board-container'); // print matrix with all EMPTY cells
+    renderBoard(gBoard); // print matrix with all EMPTY cells
     gGame.isOn = true; //when all ready
     // console.table(gBoard);
     changeSmile('play'); //change smile on init game
@@ -52,10 +55,15 @@ function resetAll() {
     resetLives(); //bring all lives back and reset the lives counter
     resetSafeClicks(); //rest safe click counter and able the btn back
     resetWatch(); //reset watch variables
-    setFlagsLeft(); // set in the span how many flags should be used
-    gManualMode = false;
+    initFlagsLeft(); // set in the span how many flags should be used
+    gManualMode = false; //place manual mines
     gMines = [];
-    removeAllLampsOffClass();
+    gMyMines = [];
+    gState = [];
+    removeAllLampsOffClass(); //change lamps back from black to regular
+
+    var elBtn = document.querySelector('.manualModeBtn'); //if restart when manual mode is on placing mines
+    removeClass(elBtn, 'manualMode');
 }
 
 function cellClicked(elCell) {
@@ -67,38 +75,54 @@ function cellClicked(elCell) {
     var cellClass = elCell.classList;
     var location = getLocationFromClass(cellClass);
     var currCell = gBoard[location.i][location.j];
+    if (currCell.isShown) return;
     if (clicksCounter === 0) { //start the clock
-        gTimeStart = Date.now();
-        gclockInterval = setInterval(stopWatch, 1000); // start the stopWatch on screen
-        clicksCounter++; //helps to now if it was the first click
-        if (gMines.length === 0) {
-            renderMines(gSize); // create and render mines to the model and to the dom
+        if (!gTimeStart) {
+            gTimeStart = Date.now();
+            gclockInterval = setInterval(stopWatch, 1000);
+        } // start the stopWatch on screen
+        if (gMines.length === 0) { //if not 0 than other function in mine.js render the mines
+            renderMines(gSize, location); // create and render mines to the model and to the dom
         }
         setMinesNegsCount(); // check and update how many mines negs every EMPTY cell has
     }
-
+    clicksCounter++;
     if (gHintMode) { // if clicked for show a hint
         showHintCells(location);
         return;
     }
 
     if (currCell.isFlagged) return;
-    if (currCell.minesNegsCount === 0 && currCell.content === EMPTY) revealNegs(location);
+    if (currCell.minesNegsCount === 0 && currCell.content === EMPTY) {
+        revealNegs(location);
+        renderBoard();
+        checkIfWIn();
+        return;
+    }
 
     if (currCell.content === MINE) {
         if (gLives > 0) { // if he has lives
             updateGLives();
             warningColor(elCell); // when hit a mine and still have life
+            clicksCounter--;
+            return;
 
         } else { //if he doesnt have lives than he lose
-            renderCell(location);
+            // renderCell(location);
             gameOver();
         }
 
     } else { //if just regular emtpy cell with more than 0 negs
-        renderCell(location);
+        updateCellInModel(location);
         checkIfWIn(); //if reveal the last empty cell and all the flags set correctly than should check win
     }
+    // storeState(gBoard);
+    renderBoard();
+}
+
+function updateCellInModel(location) { //update model and dom !
+    var cell = gBoard[location.i][location.j];
+    cell.isShown = true;
 }
 
 function flagCell(elCell) {
@@ -109,39 +133,24 @@ function flagCell(elCell) {
     var currCell = gBoard[location.i][location.j]; //wasnt sure if this way is a deep copy or only a pointer- CHECK LATER
     if ((gFlagsLeft === 0 && !currCell.isFlagged) || currCell.isShown || gManualMode) return; //if is trying to flage an unflagged cell and no flags left
 
-    gBoard[location.i][location.j].isFlagged = !currCell.isFlagged; //flag cell if is unflagged and unflagged if is flagged
-    var cellIsFlagged = gBoard[location.i][location.j].isFlagged;
+    currCell.isFlagged = !currCell.isFlagged; //flag cell if is unflagged and unflagged if is flagged
+    var cellIsFlagged = currCell.isFlagged;
     if (cellIsFlagged) { // if the change flagged the cell- Do:
-        elCell.innerHTML = FLAG;
-        gFlagsLeft--;
-        document.querySelector('.flagsLeft span').innerText = gFlagsLeft;
+        clicksCounter++;
     } else { // if the change unflagged the cell - Do:
-        gBoard[location.i][location.j].isFlagged = false;
-        elCell.innerHTML = EMPTY;
-        gFlagsLeft++;
-        document.querySelector('.flagsLeft span').innerText = gFlagsLeft;
+        currCell.isFlagged = false;
+        clicksCounter--;
     }
     checkIfWIn(); //in case all empty cells reveals and the last mine has flagged now
-}
-
-function renderCell(location) {
-    // Select the elCell and set the value
-    var cell = gBoard[location.i][location.j];
-    var elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
-    if (cell.content === EMPTY) {
-        cell.isShown = true;
-        elCell.classList += ' -marked ';
-        if (cell.minesNegsCount === 0) {
-            elCell.innerHTML = '';
-        } else elCell.innerHTML = cell.minesNegsCount;
-    } else {
-        cell.isShown = true;
-        elCell.innerHTML = MINE;
-    }
+    renderBoard();
 }
 
 function renderBoard(board = gBoard) {
-    printMat(board, '.board-container');
+    console.log('board :>> ', board);
+    storeState(board);
+    printMat(null, '.board-container');
+    updateFlagsLeft();
+    undoBtnMode();
 }
 
 function gameOver() {

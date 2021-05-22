@@ -1,4 +1,20 @@
-function printMat(mat, selector) {
+// var _ = require('lodash');
+var gState = [];
+
+function storeState(board) {
+    gState.push(_.cloneDeep(board)); //lodash 
+}
+
+function popState() {
+    return gState.pop();
+}
+
+function getState() {
+    return gState[gState.length - 1];
+}
+
+function printMat(x, selector) {
+    var mat = getState();
     var strHTML = '<table border="0"><tbody>';
     for (var i = 0; i < mat.length; i++) {
         strHTML += '<tr>';
@@ -9,26 +25,19 @@ function printMat(mat, selector) {
             var className = 'cell cell-' + i + '-' + j;
             if (cell.isShown && cellContent === EMPTY) className += ' -marked ';
             if (cell.isShown && cellContent === MINE) className += ' mineShown ';
-            strHTML += `<td class="${className}" oncontextmenu="flagCell(this)" onclick="cellClicked(this, '${cellContent}')" >`;
+            strHTML += `<td class="${className}" oncontextmenu="flagCell(this)" onclick="cellClicked(this)" >`;
+
             if (cell.isFlagged) {
                 strHTML += `${FLAG}</td>`;
+                continue;
             }
 
-            if (cell.isShown && cellContent === EMPTY) {
-                if (cell.minesNegsCount === 0) strHTML += ` </td>`;
+            if (cellContent === EMPTY) {
+                if (!cell.isShown || cellMinesNegsCount === 0) strHTML += `${cellContent}</td>`
                 else strHTML += `${cellMinesNegsCount}</td>`;
             }
 
-            if (!cell.isShown && cellContent === EMPTY) strHTML += `${cellContent}</td>`;
-            if (cellContent === MINE) {
-                if (cell.isFlagged) {
-                    strHTML += `${FLAG}</td>`;
-                    continue;
-                } else if (cell.isShown) {
-                    strHTML += `${MINE}</td>`;
-                } else strHTML += `${EMPTY}</td>`;
-
-            }
+            if (cellContent === MINE) { strHTML += (cell.isShown) ? `${MINE}</td>` : `${EMPTY}</td>`; }
         }
         strHTML += '</tr>'
     }
@@ -125,6 +134,8 @@ function resetWatch() { //reseting the watch and the counting
     gMin = 0;
     gSec = 0;
     gHelper = 0;
+    gTimeStart = null;
+    gTimeEnd = null;
     document.querySelector(".stopWatch").innerText = '00:00:00';
 }
 
@@ -138,7 +149,6 @@ var gCurrScore;
 function getAndCheckScore() { //מחסרת את ההתחלה והסיום, ובודקת אם צריך לעדכן
     gTimeEnd = Date.now();
     gCurrScore = (gTimeEnd - gTimeStart) / 1000;
-    console.log('gTimeEnd-gTimeStart/1000 :>> ', gCurrScore);
     checkIfNewBestScore();
 }
 
@@ -147,6 +157,7 @@ function checkIfNewBestScore() {
         case 4:
             if (gCurrScore < gBestScore4 || +gBestScore4 === 0) {
                 localStorage.setItem('bestScore4', gCurrScore);
+                gBestScore4 = gCurrScore;
                 console.log('new best record!');
 
             }
@@ -154,17 +165,20 @@ function checkIfNewBestScore() {
         case 8:
             if (gCurrScore < gBestScore8 || +gBestScore8 === 0) {
                 localStorage.setItem('bestScore8', gCurrScore);
+                gBestScore4 = gCurrScore;
                 console.log('new best record!');
             }
             break;
         case 12:
             if (gCurrScore < gBestScore12 || +gBestScore12 === 0) {
                 localStorage.setItem('bestScore12', gCurrScore);
+                gBestScore4 = gCurrScore;
                 console.log('new best record!');
             }
             break;
     }
-    firstCheckLocalStorage(); //to update dom
+    firstCheckLocalStorage();
+    updateBestScoreDom(); //to update dom
 
 }
 
